@@ -1,11 +1,12 @@
 package main
 
 import (
-	"gin-boilerplate/pkg/config"
-	"gin-boilerplate/pkg/database"
-	"gin-boilerplate/pkg/logger"
-	"gin-boilerplate/routers"
+	"chi-boilerplate/pkg/config"
+	"chi-boilerplate/pkg/database"
+	"chi-boilerplate/pkg/logger"
+	"chi-boilerplate/routers"
 	"github.com/spf13/viper"
+	"net/http"
 	"time"
 )
 
@@ -26,6 +27,6 @@ func main() {
 
 	router := routers.SetupRoute()
 
-	logger.Fatalf("%v", router.Run(config.ServerConfig()))
+	logger.Fatalf("%v", http.ListenAndServe(config.ServerConfig(), router))
 
 }

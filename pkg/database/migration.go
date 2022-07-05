@@ -1,7 +1,7 @@
 package database
 
 import (
-	"gin-boilerplate/models"
+	"chi-boilerplate/models"
 )
 
 //Add list of model add for migrations

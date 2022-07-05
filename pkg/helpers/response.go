@@ -1,5 +1,10 @@
 package helpers
 
+import (
+	"encoding/json"
+	"net/http"
+)
+
 type Response struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
@@ -13,3 +18,8 @@ type Response struct {
 //	response["data"] = data
 //	return response
 //}
+func JsonEncodeResponse(w http.ResponseWriter, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(&data)
+
+}

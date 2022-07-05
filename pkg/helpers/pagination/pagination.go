@@ -1,7 +1,7 @@
 package pagination
 
 import (
-	"gin-boilerplate/pkg/database"
+	"chi-boilerplate/pkg/database"
 	"gorm.io/gorm"
 	"math"
 )

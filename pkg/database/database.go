@@ -1,7 +1,7 @@
 package database
 
 import (
-	"gin-boilerplate/pkg/config"
+	"chi-boilerplate/pkg/config"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

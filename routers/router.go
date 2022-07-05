@@ -1,27 +1,28 @@
 package routers
 
 import (
-	"gin-boilerplate/routers/middleware"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
-func SetupRoute() *gin.Engine {
+func SetupRoute() *chi.Mux {
 
-	environment := viper.GetBool("DEBUG")
-	if environment {
-		gin.SetMode(gin.DebugMode)
-	} else {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
-	allowedHosts := viper.GetString("ALLOWED_HOSTS")
-	router := gin.New()
-	router.SetTrustedProxies([]string{allowedHosts})
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
-	router.Use(middleware.CORSMiddleware())
-
+	//allowedHosts := viper.GetString("ALLOWED_HOSTS")
+	router := chi.NewRouter()
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+	//router.Use(cors.CORSMiddleware())
+	router.Use(cors.Handler(cors.Options{
+		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
+		AllowedOrigins: []string{"https://*", "http://*"},
+		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 	RegisterRoutes(router) //routes register
 
 	return router
