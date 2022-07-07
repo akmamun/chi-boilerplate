@@ -15,3 +15,10 @@ type Example struct {
 func (e *Example) TableName() string {
 	return "examples"
 }
+
+func AutoMigrate() {
+
+}
+func SaveExample() {
+	save(Example{})
+}
