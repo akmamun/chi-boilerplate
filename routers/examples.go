@@ -8,5 +8,6 @@ import (
 func ExamplesRoutes(router *chi.Mux) {
 	router.Group(func(r chi.Router) {
 		r.Post("/test/", controllers.CreateExample)
+		r.Get("/test/", controllers.GetData)
 	})
 }

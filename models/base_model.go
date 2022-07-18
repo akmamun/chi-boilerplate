@@ -12,3 +12,8 @@ func Save(value interface{}) interface{} {
 	}
 	return err
 }
+
+func GetAll(value interface{}) interface{} {
+	err := database.GetDB().Find(value).Error
+	return err
+}
