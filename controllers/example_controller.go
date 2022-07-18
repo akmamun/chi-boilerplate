@@ -13,7 +13,8 @@ func CreateExample(w http.ResponseWriter, request *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	models.SaveExample()
+
+	models.SaveExample(example)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&example)
 }
@@ -36,9 +37,9 @@ func CreateExample(w http.ResponseWriter, request *http.Request) {
 //	json.NewEncoder(w).Encode(&example)
 //}
 
-func (base *BaseController) GetData(w http.ResponseWriter, request *http.Request) {
-	var example []models.Example
-	base.DB.Find(&example)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(&example)
-}
+//func (base *BaseController) GetData(w http.ResponseWriter, request *http.Request) {
+//	var example []models.Example
+//	base.DB.Find(&example)
+//	w.Header().Set("Content-Type", "application/json")
+//	json.NewEncoder(w).Encode(&example)
+//}

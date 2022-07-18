@@ -5,9 +5,10 @@ import (
 	"chi-boilerplate/pkg/logger"
 )
 
-func save(value interface{}) {
-	err := database.DB.Create(&value).Error
+func Save(value interface{}) interface{} {
+	err := database.GetDB().Create(value).Error
 	if err != nil {
-		logger.Errorf("cant save", err)
+		logger.Errorf("not save data")
 	}
+	return err
 }
