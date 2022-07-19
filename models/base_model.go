@@ -8,7 +8,7 @@ import (
 func Save(value interface{}) interface{} {
 	err := database.GetDB().Create(value).Error
 	if err != nil {
-		logger.Errorf("not save data")
+		logger.Errorf("error, not save data %v", err)
 	}
 	return err
 }

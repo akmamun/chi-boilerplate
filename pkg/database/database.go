@@ -16,10 +16,6 @@ var (
 	DBErr error
 )
 
-type Database struct {
-	*gorm.DB
-}
-
 // SetupConnection create database connection
 func SetupConnection() error {
 	var db = DB
