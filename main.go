@@ -1,6 +1,7 @@
 package main
 
 import (
+	"chi-boilerplate/migrations"
 	"chi-boilerplate/pkg/config"
 	"chi-boilerplate/pkg/database"
 	"chi-boilerplate/pkg/logger"
@@ -24,6 +25,8 @@ func main() {
 	if err := database.SetupConnection(); err != nil {
 		logger.Fatalf("database DbConnection error: %s", err)
 	}
+	//TODO changes in later
+	migrations.Migrate()
 
 	router := routers.SetupRoute()
 

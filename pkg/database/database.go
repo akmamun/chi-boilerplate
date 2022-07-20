@@ -16,10 +16,6 @@ var (
 	DBErr error
 )
 
-type Database struct {
-	*gorm.DB
-}
-
 // SetupConnection create database connection
 func SetupConnection() error {
 	var db = DB
@@ -50,8 +46,6 @@ func SetupConnection() error {
 		log.Println("Db connection error")
 		return err
 	}
-
-	err = db.AutoMigrate(migrationModels...)
 
 	if err != nil {
 		return err

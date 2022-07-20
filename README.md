@@ -1,5 +1,5 @@
 # Go Boilerplate
-An API boilerplate written in Golang with Gin Framework and Gorm
+An API boilerplate written in Golang with chi-route and Gorm
 
 ## Table of Contents
 - [Motivation](#motivation)
@@ -59,7 +59,7 @@ REPLICA_SSL_MODE=disable
 - If ENV Manage from YAML file add a config.yml file and configuration [db.go](pkg/config/db.go) and [server.go](pkg/config/server.go). See More [ENV YAML Configure](#env-yaml-configure)
 
 #### Server Configuration
-- Use [Gin](https://github.com/gin-gonic/gin) Web Framework
+- Use [chi](https://github.com/go-chi/chi) Route
 
 #### Database Configuration
 - Use [GORM](https://github.com/go-gorm/gorm) as an ORM
@@ -86,55 +86,41 @@ Follow these steps:
 - Run and Develop `make dev`
 - Check Application health available on [0.0.0.0:8000/health](http://0.0.0.0:8000/health)
 
-### Middlewares
-- Use Gin CORSMiddleware
-```go
-router := gin.New()
-router.Use(gin.Logger())
-router.Use(gin.Recovery())
-router.Use(middleware.CORSMiddleware())
-```
-
 ### Boilerplate Structure
-<pre>├── <font color="#3465A4"><b>controllers</b></font>
-│   └── base_controller.go
-├── docker-compose-dev.yml
-├── docker-compose-prod.yml
-├── Dockerfile
-├── Dockerfile-dev
+<<pre><font color="#2A7BDE"><b>.</b></font>
+├── <font color="#2A7BDE"><b>controllers</b></font>
+│   └── example_controller.go
 ├── go.mod
 ├── go.sum
 ├── LICENSE
 ├── main.go
 ├── Makefile
-├── <font color="#3465A4"><b>models</b></font>
+├── <font color="#2A7BDE"><b>migrations</b></font>
+│   └── migrations.go
+├── <font color="#2A7BDE"><b>models</b></font>
+│   ├── base_model.go
 │   └── example_model.go
-├── <font color="#3465A4"><b>pkg</b></font>
-│   ├── <font color="#3465A4"><b>config</b></font>
+├── <font color="#2A7BDE"><b>pkg</b></font>
+│   ├── <font color="#2A7BDE"><b>config</b></font>
 │   │   ├── config.go
 │   │   ├── db.go
 │   │   └── server.go
-│   ├── <font color="#3465A4"><b>database</b></font>
-│   │   ├── database.go
-│   │   └── migration.go
-│   ├── <font color="#3465A4"><b>helpers</b></font>
-│   │   ├── <font color="#3465A4"><b>pagination</b></font>
+│   ├── <font color="#2A7BDE"><b>database</b></font>
+│   │   └── database.go
+│   ├── <font color="#2A7BDE"><b>helpers</b></font>
+│   │   ├── <font color="#2A7BDE"><b>pagination</b></font>
 │   │   │   └── pagination.go
 │   │   ├── response.go
 │   │   └── search.go
-│   └── <font color="#3465A4"><b>logger</b></font>
+│   └── <font color="#2A7BDE"><b>logger</b></font>
 │       └── logger.go
 ├── README.md
-├── <font color="#3465A4"><b>repository</b></font>
+├── <font color="#2A7BDE"><b>repository</b></font>
 │   └── example_repo.go
-└── <font color="#3465A4"><b>routers</b></font>
-    ├── index.go
-    ├── <font color="#3465A4"><b>middleware</b></font>
-    │   └── cors.go
-    └── router.go
-</pre>
-### Examples
-- More Example [gin-boilerplate-examples](https://github.com/akmamun/gin-boilerplate-examples)
+├── <font color="#2A7BDE"><b>routers</b></font>
+     ├── examples.go
+     ├── index.go 
+     └── router.go</pre>
 
 ### Let's Build an API
 
@@ -158,15 +144,22 @@ func (e *Example) TableName() string {
 	return "examples"
 }
 ```
-2. Add Model to [migration](pkg/database/migration.go)
+2. Add Model to [migration](migrations/migrations.go)
 ```go
-package database
+package migrations
 
 import (
-	"gin-boilerplate/models"
+  "chi-boilerplate/models"
+  "chi-boilerplate/pkg/database"
 )
-//Add list of model add for migrations
-var migrationModels = []interface{}{&models.Example{}}
+
+func Migrate() {
+  var migrationModels = []interface{}{&models.Example{}}
+  err := database.GetDB().AutoMigrate(migrationModels...)
+  if err != nil {
+    return
+  }
+}
 ```
 3. [controller](controllers) folder add a file `example_controller.go`
 - Create API Endpoint 
@@ -176,45 +169,45 @@ var migrationModels = []interface{}{&models.Example{}}
 package controllers
 
 import (
-	"gin-boilerplate/models"
-	"gin-boilerplate/pkg/logger"
-	"github.com/gin-gonic/gin"
-	"net/http"
+  "chi-boilerplate/models"
+  "encoding/json"
+  "net/http"
 )
 
-func (base *Controller) CreateExample(ctx *gin.Context) {
-	example := new(models.Example)
-
-	err := ctx.ShouldBindJSON(&example)
-	if err != nil {
-		logger.Errorf("error: %v", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	err = base.DB.Create(&example).Error
-	if err != nil {
-		logger.Errorf("error: %v", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	ctx.JSON(http.StatusOK, &example)
+func CreateExample(w http.ResponseWriter, request *http.Request) {
+  example := new(models.Example)
+  err := json.NewDecoder(request.Body).Decode(&example)
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusBadRequest)
+    return
+  }
+  models.SaveExample(&example)
+  w.Header().Set("Content-Type", "application/json")
+  json.NewEncoder(w).Encode(&example)
 }
+
+func GetData(w http.ResponseWriter, request *http.Request) {
+  var example []models.Example
+  models.GetAll(&example)
+  w.Header().Set("Content-Type", "application/json")
+  json.NewEncoder(w).Encode(&example)
+}
+
 ```
 4. [routers](routers) folder add a file `example.go`
 ```go
 package routers
 
 import (
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
-	"gin-boilerplate/controllers"
+  "chi-boilerplate/controllers"
+  "github.com/go-chi/chi/v5"
 )
 
-
-func TestRoutes(route *gin.Engine) {
-	ctrl := controllers.Controller{DB: database.GetDB()}
-	v1 := route.Group("/v1")
-	v1.POST("/example/", ctrl.CreateExample)
+func ExamplesRoutes(router *chi.Mux) {
+  router.Group(func(r chi.Router) {
+    r.Post("/test/", controllers.CreateExample)
+    r.Get("/test/", controllers.GetData)
+  })
 }
 ```
 5. Finally, register routes to [index.go](routers/index.go)
@@ -222,15 +215,17 @@ func TestRoutes(route *gin.Engine) {
 package routers
 
 import (
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
-	"net/http"
+  "github.com/go-chi/chi/v5"
+  "net/http"
 )
 
 //RegisterRoutes add all routing list here automatically get main router
-func RegisterRoutes(route *gin.Engine) {
-	//Add All route
-	TestRoutes(route)
+func RegisterRoutes(router *chi.Mux) {
+  router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte("\"live\": \"ok\""))
+  })
+  //Add All route
+  ExamplesRoutes(router)
 }
 ```
 - Congratulation, your new endpoint `0.0.0.0:8000/v1/example/`

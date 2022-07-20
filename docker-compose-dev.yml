@@ -14,19 +14,19 @@ services:
     networks:
       - chi_server
 
-#  pgadmin:
-#    container_name: pgadmin4_container
-#    image: dpage/pgadmin4
-#    restart: always
-#    ports:
-#      - "5050:80"
-#    environment:
-#      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-#      - PGADMIN_DEFAULT_PASSWORD=root
-#    logging:
-#      driver: none
-#    volumes:
-#      - pgadmin_data:/var/lib/pgadmin
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    logging:
+      driver: none
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
   server:
     container_name: dev_go_server
