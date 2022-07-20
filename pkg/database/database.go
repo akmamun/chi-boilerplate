@@ -47,8 +47,6 @@ func SetupConnection() error {
 		return err
 	}
 
-	//err = db.AutoMigrate(migrationModels...)
-
 	if err != nil {
 		return err
 	}
