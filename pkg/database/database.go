@@ -11,9 +11,8 @@ import (
 )
 
 var (
-	DB    *gorm.DB
-	err   error
-	DBErr error
+	DB  *gorm.DB
+	err error
 )
 
 // DbConnection create database connection
@@ -40,24 +39,15 @@ func DbConnection() error {
 			Policy: dbresolver.RandomPolicy{},
 		}))
 	}
-
 	if err != nil {
-		DBErr = err
-		log.Println("Db connection error")
+		log.Fatalf("Db connection error")
 		return err
 	}
-
 	DB = db
-
 	return nil
 }
 
 // GetDB connection
 func GetDB() *gorm.DB {
 	return DB
-}
-
-// GetDBError connection error
-func GetDBError() error {
-	return DBErr
 }
