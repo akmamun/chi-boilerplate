@@ -16,8 +16,8 @@ var (
 	DBErr error
 )
 
-// SetupConnection create database connection
-func SetupConnection() error {
+// DbConnection create database connection
+func DbConnection() error {
 	var db = DB
 	masterDSN, replicaDSN := config.DbConfiguration()
 
@@ -47,9 +47,6 @@ func SetupConnection() error {
 		return err
 	}
 
-	if err != nil {
-		return err
-	}
 	DB = db
 
 	return nil

@@ -1,4 +1,4 @@
-package models
+package repository
 
 import (
 	"chi-boilerplate/pkg/database"
@@ -14,6 +14,16 @@ func Save(value interface{}) interface{} {
 }
 
 func Get(value interface{}) interface{} {
+	err := database.GetDB().Find(value).Error
+	return err
+}
+
+func GetOne(value interface{}) interface{} {
+	err := database.GetDB().Last(value).Error
+	return err
+}
+
+func Update(value interface{}) interface{} {
 	err := database.GetDB().Find(value).Error
 	return err
 }

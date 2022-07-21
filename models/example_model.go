@@ -1,6 +1,7 @@
 package models
 
 import (
+	"chi-boilerplate/repository"
 	"time"
 )
 
@@ -16,9 +17,9 @@ func (Example) TableName() string {
 	return "examples"
 }
 func SaveExample(data interface{}) {
-	Save(data)
+	repository.Save(data)
 }
 func GetAll(value interface{}) interface{} {
-	err := Get(value)
+	err := repository.Get(value)
 	return err
 }

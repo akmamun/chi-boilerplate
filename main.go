@@ -22,7 +22,7 @@ func main() {
 		logger.Fatalf("config SetupConfig() error: %s", err)
 	}
 
-	if err := database.SetupConnection(); err != nil {
+	if err := database.DbConnection(); err != nil {
 		logger.Fatalf("database DbConnection error: %s", err)
 	}
 	//TODO changes in later
