@@ -56,7 +56,7 @@ REPLICA_SSL_MODE=disable
 ```
 - Server `DEBUG` set `False` in Production
 - Database Logger `MASTER_DB_LOG_MODE` and `REPLICA_DB_LOG_MODE`  set `False` in production
-- If ENV Manage from YAML file add a config.yml file and configuration [db.go](pkg/config/db.go) and [server.go](pkg/config/server.go). See More [ENV YAML Configure](#env-yaml-configure)
+- If ENV Manage from YAML file add a config.yml file and configuration [db.go](config/db.go) and [server.go](config/server.go). See More [ENV YAML Configure](#env-yaml-configure)
 
 #### Server Configuration
 - Use [chi](https://github.com/go-chi/chi) Route
@@ -87,40 +87,42 @@ Follow these steps:
 - Check Application health available on [0.0.0.0:8000/health](http://0.0.0.0:8000/health)
 
 ### Boilerplate Structure
-<<pre><font color="#2A7BDE"><b>.</b></font>
-├── <font color="#2A7BDE"><b>controllers</b></font>
+<pre>├── <font color="#3465A4"><b>config</b></font>
+│   ├── config.go
+│   ├── db.go
+│   └── server.go
+├── <font color="#3465A4"><b>controllers</b></font>
 │   └── example_controller.go
+├── docker-compose-dev.yml
+├── docker-compose-prod.yml
+├── Dockerfile
+├── Dockerfile-dev
 ├── go.mod
 ├── go.sum
+├── <font color="#3465A4"><b>helpers</b></font>
+│   ├── response.go
+│   └── search.go
+├── <font color="#3465A4"><b>infra</b></font>
+│   ├── <font color="#3465A4"><b>database</b></font>
+│   │   └── database.go
+│   └── <font color="#3465A4"><b>logger</b></font>
+│       └── logger.go
 ├── LICENSE
 ├── main.go
 ├── Makefile
-├── <font color="#2A7BDE"><b>migrations</b></font>
+├── <font color="#3465A4"><b>migrations</b></font>
 │   └── migrations.go
-├── <font color="#2A7BDE"><b>models</b></font>
-│   ├── base_model.go
+├── <font color="#3465A4"><b>models</b></font>
 │   └── example_model.go
-├── <font color="#2A7BDE"><b>pkg</b></font>
-│   ├── <font color="#2A7BDE"><b>config</b></font>
-│   │   ├── config.go
-│   │   ├── db.go
-│   │   └── server.go
-│   ├── <font color="#2A7BDE"><b>database</b></font>
-│   │   └── database.go
-│   ├── <font color="#2A7BDE"><b>helpers</b></font>
-│   │   ├── <font color="#2A7BDE"><b>pagination</b></font>
-│   │   │   └── pagination.go
-│   │   ├── response.go
-│   │   └── search.go
-│   └── <font color="#2A7BDE"><b>logger</b></font>
-│       └── logger.go
 ├── README.md
-├── <font color="#2A7BDE"><b>repository</b></font>
-│   └── example_repo.go
-├── <font color="#2A7BDE"><b>routers</b></font>
-     ├── examples.go
-     ├── index.go 
-     └── router.go</pre>
+├── <font color="#3465A4"><b>repository</b></font>
+│   └── db_repository.go
+└── <font color="#3465A4"><b>routers</b></font>
+    ├── index.go
+    ├── <font color="#3465A4"><b>middlewares</b></font>
+    │   └── cors.go
+    └── router.go
+</pre>
 
 ### Let's Build an API
 
@@ -145,17 +147,18 @@ func (e *Example) TableName() string {
 }
 ```
 2. Add Model to [migration](migrations/migrations.go)
+
 ```go
 package migrations
 
 import (
   "chi-boilerplate/models"
-  "chi-boilerplate/pkg/database"
+  "chi-boilerplate/infra/database"
 )
 
 func Migrate() {
   var migrationModels = []interface{}{&models.Example{}}
-  err := database.GetDB().AutoMigrate(migrationModels...)
+  err := database.DB.AutoMigrate(migrationModels...)
   if err != nil {
     return
   }
@@ -169,7 +172,9 @@ func Migrate() {
 package controllers
 
 import (
+  "chi-boilerplate/helpers"
   "chi-boilerplate/models"
+  "chi-boilerplate/repository"
   "encoding/json"
   "net/http"
 )
@@ -181,36 +186,17 @@ func CreateExample(w http.ResponseWriter, request *http.Request) {
     http.Error(w, err.Error(), http.StatusBadRequest)
     return
   }
-  models.SaveExample(&example)
-  w.Header().Set("Content-Type", "application/json")
-  json.NewEncoder(w).Encode(&example)
+  repository.Save(&example)
+  helpers.SuccessResponse(w, &example)
 }
 
 func GetData(w http.ResponseWriter, request *http.Request) {
   var example []models.Example
-  models.GetAll(&example)
-  w.Header().Set("Content-Type", "application/json")
-  json.NewEncoder(w).Encode(&example)
-}
-
-```
-4. [routers](routers) folder add a file `example.go`
-```go
-package routers
-
-import (
-  "chi-boilerplate/controllers"
-  "github.com/go-chi/chi/v5"
-)
-
-func ExamplesRoutes(router *chi.Mux) {
-  router.Group(func(r chi.Router) {
-    r.Post("/test/", controllers.CreateExample)
-    r.Get("/test/", controllers.GetData)
-  })
+  repository.Get(&example)
+  helpers.SuccessResponse(w, &example)
 }
 ```
-5. Finally, register routes to [index.go](routers/index.go)
+4. Finally, register routes to [index.go](routers/index.go)
 ```go
 package routers
 
@@ -225,7 +211,10 @@ func RegisterRoutes(router *chi.Mux) {
     w.Write([]byte("\"live\": \"ok\""))
   })
   //Add All route
-  ExamplesRoutes(router)
+  router.Group(func(r chi.Router) {
+    r.Post("/test/", controllers.CreateExample)
+    r.Get("/test/", controllers.GetData)
+  })
 }
 ```
 - Congratulation, your new endpoint `0.0.0.0:8000/v1/example/`
@@ -258,7 +247,7 @@ server:
   request:
     timeout: 100
 ```
-- [Server Config](pkg/config/server.go)
+- [Server Config](config/server.go)
 ```go
 func ServerConfig() string {
 viper.SetDefault("server.host", "0.0.0.0")
@@ -267,7 +256,7 @@ appServer := fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetStrin
 return appServer
 }
 ```
-- [DB Config](pkg/config/db.go)
+- [DB Config](config/db.go)
 ```go
 func DbConfiguration() string {
 	

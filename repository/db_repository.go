@@ -1,29 +1,29 @@
 package repository
 
 import (
-	"chi-boilerplate/pkg/database"
-	"chi-boilerplate/pkg/logger"
+	"chi-boilerplate/infra/database"
+	"chi-boilerplate/infra/logger"
 )
 
-func Save(value interface{}) interface{} {
-	err := database.GetDB().Create(value).Error
+func Save(model interface{}) interface{} {
+	err := database.DB.Create(model).Error
 	if err != nil {
 		logger.Errorf("error, not save data %v", err)
 	}
 	return err
 }
 
-func Get(value interface{}) interface{} {
-	err := database.GetDB().Find(value).Error
+func Get(model interface{}) interface{} {
+	err := database.DB.Find(model).Error
 	return err
 }
 
-func GetOne(value interface{}) interface{} {
-	err := database.GetDB().Last(value).Error
+func GetOne(model interface{}) interface{} {
+	err := database.DB.Last(model).Error
 	return err
 }
 
-func Update(value interface{}) interface{} {
-	err := database.GetDB().Find(value).Error
+func Update(model interface{}) interface{} {
+	err := database.DB.Find(model).Error
 	return err
 }

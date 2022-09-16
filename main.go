@@ -1,10 +1,10 @@
 package main
 
 import (
+	"chi-boilerplate/config"
+	"chi-boilerplate/infra/database"
+	"chi-boilerplate/infra/logger"
 	"chi-boilerplate/migrations"
-	"chi-boilerplate/pkg/config"
-	"chi-boilerplate/pkg/database"
-	"chi-boilerplate/pkg/logger"
 	"chi-boilerplate/routers"
 	"github.com/spf13/viper"
 	"net/http"
@@ -22,14 +22,14 @@ func main() {
 		logger.Fatalf("config SetupConfig() error: %s", err)
 	}
 
-	if err := database.DbConnection(); err != nil {
+	masterDSN, replicaDSN := config.DbConfiguration()
+	if err := database.DbConnection(masterDSN, replicaDSN); err != nil {
 		logger.Fatalf("database DbConnection error: %s", err)
 	}
-	//TODO changes in later
+	//later separate migration
 	migrations.Migrate()
 
 	router := routers.SetupRoute()
-
 	logger.Fatalf("%v", http.ListenAndServe(config.ServerConfig(), router))
 
 }

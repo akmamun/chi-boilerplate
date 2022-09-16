@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   postgres_db:
-    container_name: dev_pg_db
+    container_name: dev_pg_db_C
     image: postgres:13-alpine
     environment:
       - POSTGRES_USER=${MASTER_DB_USER}
@@ -13,23 +13,23 @@ services:
     restart: always
     networks:
       - chi_server
-
-  pgadmin:
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4
-    restart: always
-    ports:
-      - "5050:80"
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=root
-    logging:
-      driver: none
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
+#
+#  pgadmin:
+#    container_name: pgadmin4_container
+#    image: dpage/pgadmin4
+#    restart: always
+#    ports:
+#      - "5050:80"
+#    environment:
+#      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+#      - PGADMIN_DEFAULT_PASSWORD=root
+#    logging:
+#      driver: none
+#    volumes:
+#      - pgadmin_data:/var/lib/pgadmin
 
   server:
-    container_name: dev_go_server
+    container_name: dev_go_server_c
     build:
       context: .
       dockerfile: Dockerfile-dev

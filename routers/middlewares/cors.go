@@ -1,4 +1,4 @@
-package routers
+package middlewares
 
 import (
 	"github.com/go-chi/cors"

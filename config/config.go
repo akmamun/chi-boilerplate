@@ -1,7 +1,7 @@
 package config
 
 import (
-	"chi-boilerplate/pkg/logger"
+	"chi-boilerplate/infra/logger"
 	"github.com/spf13/viper"
 )
 

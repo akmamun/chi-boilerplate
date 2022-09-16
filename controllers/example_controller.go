@@ -1,8 +1,9 @@
 package controllers
 
 import (
+	"chi-boilerplate/helpers"
 	"chi-boilerplate/models"
-	"chi-boilerplate/pkg/helpers"
+	"chi-boilerplate/repository"
 	"encoding/json"
 	"net/http"
 )
@@ -14,12 +15,12 @@ func CreateExample(w http.ResponseWriter, request *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	models.SaveExample(&example)
+	repository.Save(&example)
 	helpers.SuccessResponse(w, &example)
 }
 
 func GetData(w http.ResponseWriter, request *http.Request) {
 	var example []models.Example
-	models.GetAll(&example)
+	repository.Get(&example)
 	helpers.SuccessResponse(w, &example)
 }

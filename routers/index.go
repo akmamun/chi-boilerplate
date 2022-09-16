@@ -1,7 +1,8 @@
 package routers
 
 import (
-	"chi-boilerplate/pkg/helpers"
+	"chi-boilerplate/controllers"
+	"chi-boilerplate/helpers"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 )
@@ -12,5 +13,8 @@ func RegisterRoutes(router *chi.Mux) {
 		helpers.SuccessResponse(w, "alive ok")
 	})
 	//Add All route
-	ExamplesRoutes(router)
+	router.Group(func(r chi.Router) {
+		r.Post("/test/", controllers.CreateExample)
+		r.Get("/test/", controllers.GetData)
+	})
 }

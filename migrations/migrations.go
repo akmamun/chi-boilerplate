@@ -1,8 +1,8 @@
 package migrations
 
 import (
+	"chi-boilerplate/infra/database"
 	"chi-boilerplate/models"
-	"chi-boilerplate/pkg/database"
 )
 
 func Migrate() {
