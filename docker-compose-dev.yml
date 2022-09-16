@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   postgres_db:
-    container_name: dev_pg_db_C
+    container_name: dev_pg_db
     image: postgres:13-alpine
     environment:
       - POSTGRES_USER=${MASTER_DB_USER}
@@ -29,7 +29,7 @@ services:
 #      - pgadmin_data:/var/lib/pgadmin
 
   server:
-    container_name: dev_go_server_c
+    container_name: dev_go_server
     build:
       context: .
       dockerfile: Dockerfile-dev
